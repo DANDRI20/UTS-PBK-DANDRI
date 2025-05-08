@@ -1,30 +1,70 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+import { ref, computed, onMounted } from 'vue';
+
+const daftarTugas = ref([
+  { nama: "Cek kualitas TBS (Tandan Buah Segar)", selesai: false },
+  { nama: "Pantau harga pasar sawit", selesai: true },
+  { nama: "Koordinasi dengan mandor kebun", selesai: false },
+  { nama: "Inspeksi alat panen dan transportasi", selesai: true }
+]);
+
+const tugasBaru = ref("");
+const inputTugas = ref(null);
+
+const sedangEdit = ref(false);
+const indeksEdit = ref(null);
+const tampilkanSelesai = ref(true);
+
+const tambahTugas = () => {
+  const bersih = tugasBaru.value.trim();
+  if (bersih) {
+    daftarTugas.value.push({ nama: bersih, selesai: false });
+    tugasBaru.value = "";
+    inputTugas.value?.focus();
+  }
+};
+
+const hapusTugas = (indeks) => {
+  daftarTugas.value.splice(indeks, 1);
+  batalEdit();
+};
+
+const editTugas = (indeks) => {
+  tugasBaru.value = daftarTugas.value[indeks].nama;
+  sedangEdit.value = true;
+  indeksEdit.value = indeks;
+  inputTugas.value?.focus();
+};
+
+const perbaruiTugas = () => {
+  const bersih = tugasBaru.value.trim();
+  if (indeksEdit.value !== null && bersih) {
+    daftarTugas.value[indeksEdit.value].nama = bersih;
+    batalEdit();
+  }
+};
+
+const batalEdit = () => {
+  tugasBaru.value = "";
+  sedangEdit.value = false;
+  indeksEdit.value = null;
+};
+
+const tugasTersaring = computed(() =>
+  tampilkanSelesai.value
+    ? daftarTugas.value
+    : daftarTugas.value.filter(tugas => !tugas.selesai)
+);
+
+onMounted(() => {
+  inputTugas.value?.focus();
+});
 </script>
 
 <template>
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <HelloWorld msg="Vite + Vue" />
+  
 </template>
 
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
+
 </style>
